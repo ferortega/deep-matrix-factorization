@@ -1,9 +1,7 @@
-package com.github.ferortega.deepmf;
+package com.github.ferortega.deepmf.experiments;
 
-import es.upm.etsisi.cf4j.data.BenchmarkDataModels;
+import com.github.ferortega.deepmf.recommender.DeepMF;
 import es.upm.etsisi.cf4j.data.DataModel;
-import es.upm.etsisi.cf4j.data.DataSet;
-import es.upm.etsisi.cf4j.data.RandomSplitDataSet;
 import es.upm.etsisi.cf4j.qualityMeasure.QualityMeasure;
 import es.upm.etsisi.cf4j.qualityMeasure.prediction.MAE;
 import org.apache.commons.math3.util.Pair;
@@ -16,20 +14,19 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class GridSearch {
+public class DeepMfGridSearch {
 
     private static int[] DEPTHS = {1, 2, 3, 4};
+
     private static Integer[] NUM_FACTORS = {3, 6, 9};
     private static Double[] LEARNING_RATE = {0.01, 0.1};
     private static Double[] REGULARIZATION = {0.01, 0.1};
-    private static int NUM_ITERS = 50;
 
-    private static long RANDOM_SEED = 43;
+    private static int NUM_ITERS = 50;
 
     public static void main (String [] args) throws IOException {
 
-//        DataModel datamodel = BenchmarkDataModels.MovieLens1M();
-        DataModel datamodel = BenchmarkDataModels.FilmTrust();
+        DataModel datamodel = Settings.DATAMODEL;
 
         List<Pair<String, Double>> results = new ArrayList<>();
 
@@ -57,7 +54,7 @@ public class GridSearch {
                         DecimalFormat df = new DecimalFormat("0.0000");
                         double complete = 100 * (double) count / (double) developmentSetSize;
 
-                        DeepMF deepmf = new DeepMF(datamodel, toIntArray(numFactors), numIters, toDoubleArray(learningRate), toDoubleArray(regularization), RANDOM_SEED);
+                        DeepMF deepmf = new DeepMF(datamodel, toIntArray(numFactors), numIters, toDoubleArray(learningRate), toDoubleArray(regularization), Settings.RANDOM_SEED);
 
                         System.out.println("[Evaluation " + count + " of " + developmentSetSize + "; " + df.format(complete) + "%] " + deepmf.toString());
 
@@ -66,6 +63,10 @@ public class GridSearch {
                         QualityMeasure mae = new MAE(deepmf);
                         double score =  mae.getScore();
 
+                        if (Double.isNaN(score) || Double.isInfinite(score)) {
+                            score = Double.MAX_VALUE;
+                        }
+
                         results.add(new Pair<String, Double>(deepmf.toString(), score));
                     }
                 }
@@ -73,9 +74,7 @@ public class GridSearch {
         }
 
         Comparator<Pair<String, Double>> comparator = Comparator.comparing(Pair::getValue, (v1, v2) -> {
-            if (Double.isNaN(v1) || Double.isNaN(v2)) {
-                return 1;
-            } else if (v1 > v2) {
+            if (v1 > v2) {
                 return 1;
             } else if (v2 > v1) {
                 return -1;
@@ -86,7 +85,7 @@ public class GridSearch {
 
         results.sort(comparator);
 
-        System.out.println("\nTuning parameters for BeMF recommender:\n\nBest parameters set found on development set:\n\n"
+        System.out.println("\nTuning parameters for DeepMF recommender:\n\nBest parameters set found on development set:\n\n"
                 + results.get(0).getKey()
                 + "\n\nMAE scores on development set:\n");
 

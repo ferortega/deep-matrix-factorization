@@ -1,4 +1,4 @@
-package com.github.ferortega.deepmf;
+package com.github.ferortega.deepmf.recommender;
 
 import es.upm.etsisi.cf4j.data.DataModel;
 import es.upm.etsisi.cf4j.data.Item;
@@ -9,6 +9,7 @@ import es.upm.etsisi.cf4j.util.process.Parallelizer;
 import es.upm.etsisi.cf4j.util.process.Partible;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
 
 public class DeepMF extends Recommender {
@@ -26,12 +27,20 @@ public class DeepMF extends Recommender {
     double[][] userFactors;
     double[][] itemFactors;
 
-    private double average;
-
     private DeepMF parent;
     private DeepMF child;
 
-    public DeepMF(DataModel datamodel, int[] numFactors,int[] numIters, double[] learningRate, double[] regularization) {
+    public DeepMF(DataModel datamodel, Map<String,Object> params) {
+        this(
+            datamodel,
+            (int[]) params.get("numFactors"),
+            (int[]) params.get("numIters"),
+            (double[]) params.get("learningRate"),
+            (double[]) params.get("regularization"),
+            params.containsKey("seed") ? (long) params.get("seed") : System.currentTimeMillis());
+    }
+
+    public DeepMF(DataModel datamodel, int[] numFactors, int[] numIters, double[] learningRate, double[] regularization) {
         this(datamodel, numFactors, numIters, learningRate, regularization, 0, null, System.currentTimeMillis());
     }
 
@@ -72,21 +81,6 @@ public class DeepMF extends Recommender {
                 this.itemFactors[itemIndex][f] = rand.nextDouble();
             }
         }
-
-
-        double sum = 0;
-        int count = 0;
-
-        for (int userIndex = 0; userIndex < datamodel.getNumberOfUsers(); userIndex++) {
-            User user = datamodel.getUser(userIndex);
-            for (int pos = 0; pos < user.getNumberOfRatings(); pos++) {
-                int itemIndex = user.getItemAt(pos);
-                sum += this.getValue(userIndex, itemIndex);
-                count++;
-            }
-        }
-
-        this.average = sum / count;
     }
 
 
@@ -131,7 +125,7 @@ public class DeepMF extends Recommender {
         return this.child != null;
     }
 
-    private double getValue (int userIndex, int itemIndex) {
+    private double getValue(int userIndex, int itemIndex) {
         if (this.hasParent()) {
             double value = this.parent.getValue(userIndex, itemIndex);
             double estimation = this.parent.getEstimation(userIndex, itemIndex);
@@ -143,7 +137,15 @@ public class DeepMF extends Recommender {
         }
     }
 
-    private double getEstimation (int userIndex, int itemIndex) {
+    public double getEstimation(int userIndex, int itemIndex, int depth) {
+        if (depth == 0) {
+            return getEstimation(userIndex, itemIndex);
+        } else {
+            return this.child.getEstimation(userIndex, itemIndex, depth - 1);
+        }
+    }
+
+    private double getEstimation(int userIndex, int itemIndex) {
         return Maths.dotProduct(this.userFactors[userIndex], this.itemFactors[itemIndex]);
     }
 
