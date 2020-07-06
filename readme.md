@@ -1,4 +1,12 @@
-# Grid Search
+# Deep Matrix Factorization
+
+This repository contains the source code of the experiments performed for the following publication:
+
+R. Lara-Cabrera, A. González-Prieto, & F. Ortega. Deep Matrix Factorization approach for Collaborative Filtering Recommender Systems.
+
+# Grid Search Optimization
+
+In this section you can find the result of the Grid Search Optimization.
 
 ## MovieLens 100K
 
@@ -86,7 +94,6 @@ MAE scores on development set:
 0.782955 for {numIters=50, lambda=0.06999999999999999, seed=43, gamma=0.0013, numFactors=2}
 ```
 
-
 ## MovieLens 1M
 
 ### DeepMF
@@ -172,7 +179,6 @@ MAE scores on development set:
 0.744732 for {numIters=50, lambda=0.05, seed=43, gamma=0.0013, numFactors=4}
 0.744798 for {numIters=50, lambda=0.060000000000000005, seed=43, gamma=0.0013, numFactors=4}
 ```
-
 
 ## FilmTrust
 
@@ -260,7 +266,6 @@ MAE scores on development set:
 0.663125 for {numIters=50, lambda=0.06999999999999999, seed=43, gamma=0.0013, numFactors=2}
 ```
 
-
 ## MyAnimeList
 
 ### DeepMF
@@ -346,3 +351,14 @@ MAE scores on development set:
 0.953597 for {numIters=50, lambda=0.03, seed=43, gamma=0.0014000000000000002, numFactors=2}
 0.953782 for {numIters=50, lambda=0.05, seed=43, gamma=0.0014000000000000002, numFactors=4}
 ```
+
+# Comparison with FAuST
+
+DeepMF has been compared with FAuST:
+
+Le Magoarou, L., & Gribonval, R. (2016). Flexible multilayer sparse approximations of matrices and applications. IEEE Journal of Selected Topics in Signal Processing, 10(4), 688-700.
+
+The code of this experiments has been written in Python. To run it:
+
+1. Export the dataset using the Java class `com.github.ferortega.deepmf.ExportFAuSTDatasets`.
+2. Run the experiment contained in `FAuST.ipynb` file.

@@ -26,6 +26,7 @@ public class Settings {
     public static Map<String, Object> PMF_PARAMS;
     public static Map<String, Object> NMF_PARAMS;
     public static Map<String, Object> SVDPP_PARAMS;
+    public static Map<String, Object> FAUST_PARAMS;
 
     // Uncomment this for MovieLens 100K
     static {
@@ -62,6 +63,11 @@ public class Settings {
                     "numIters", 50,
                     "lambda", 0.08,
                     "gamma", 0.0014,
+                    "seed", RANDOM_SEED
+            );
+
+            FAUST_PARAMS = Map.of(
+                    "numFactors", 2,
                     "seed", RANDOM_SEED
             );
 
