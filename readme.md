@@ -361,4 +361,4 @@ Le Magoarou, L., & Gribonval, R. (2016). Flexible multilayer sparse approximatio
 The code of this experiments has been written in Python. To run it:
 
 1. Export the dataset using the Java class `com.github.ferortega.deepmf.ExportFAuSTDatasets`.
-2. Run the experiment contained in `FAuST.ipynb` file.
+2. Run the experiment contained in the `FAuST.py` file.
